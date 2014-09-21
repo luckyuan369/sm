@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<import resource="appServlet/servlet-context.xml"/>
+	<import resource="spring-mybatis.xml"/>
+		
+	<!-- 读取资源文件 -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:jdbc.properties" />
+	</bean>
+	
+	<!-- 配置数据源 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>${driverClassName}</value>
+		</property>
+		<property name="password">
+			<value>${password}</value>
+		</property>
+		<property name="username">
+			<value>${username}</value>
+		</property>
+		<property name="url">
+			<value>${url}</value>
+		</property>
+	</bean>
+	
+	<bean id="pagePlugin" class="com.qufeng.yuan.pulgin.mybatis.plugin.PagePlugin">
+		<property name="properties">
+			<props>
+				<prop key="dialect">com.qufeng.yuan.pulgin.jdbc.dialet.H2Dialect</prop>
+				<prop key="pageSqlId">.*query.*</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="plugins">
+			<array>
+				<ref bean="pagePlugin" />
+			</array>
+		</property>
+		<property name="mapperLocations">
+			<list>
+				<!-- 自动匹配Mapper映射文件  -->
+				<value>classpath:com/qufeng/yuan/entity/*-mapper.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage" value="com.dahafo.demo.um.dao" />  
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />  
+    </bean>
+    
+	
+	<!-- 定时任务驱动配置 -->
+	<task:annotation-driven/>
+	
+	<!-- 第一种配置方法：基于XML的事务管理 -->
+	<!-- 第二中配置方法：基于@Transactional的事务管理 -->
+	<!-- 第二种:事务驱动配置 -->
+	<tx:annotation-driven/>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+    	<property name="dataSource" ref="dataSource"></property>  
+	</bean>
+	
+	
+</beans>
