@@ -75,12 +75,7 @@
 		WHERE
 		user_id=#{id})
 	</select>
-
-	<!-- 增加角色和用户 -->
-	<insert id="saveUserRole" parameterType="UserRoles">
-		insert into user_role(user_id,role_id) values (#{userId},#{roleId})
-	</insert>
-
+		
 	<delete id="deleteUserRole" parameterType="String">
 		delete from user_role where user_id=#{userId}
 	</delete>

@@ -1,8 +1,9 @@
 package com.qufeng.yuan.entity;
 
-@SuppressWarnings("serial")
 public class Roles implements java.io.Serializable {
-
+	
+	private static final long serialVersionUID = 7554196238197170672L;
+	
 	private Integer id;
 	private Integer enable;//是否禁用角色　1　表示禁用　2　表示不禁用
 	private String name;
